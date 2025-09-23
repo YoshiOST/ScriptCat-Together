@@ -12,6 +12,27 @@
 (function () {
   'use strict';
 
+    // Create button
+    const button = document.createElement('button');
+    button.textContent = 'Toggle';
+    button.id = 'toggle-btn';
+
+    // Style it (top-right)
+    Object.assign(button.style, {
+        position: 'fixed',
+        top: '100px',
+        right: '10px',
+        padding: '8px 12px',
+        backgroundColor: '#007bff',
+        color: 'white',
+        border: 'none',
+        borderRadius: '6px',
+        cursor: 'pointer',
+        zIndex: '9999'
+    });
+
+    document.body.appendChild(button);
+
   const HIGHLIGHT_CLASS = 'sc-click-highlight';
   let scriptEnabled = false; // default: ON
 
@@ -116,6 +137,13 @@
       }
     });
   }
+button.addEventListener('click', () => {
+        scriptEnabled = !scriptEnabled;
+        button.style.backgroundColor = scriptEnabled ? '#28a745' : '#007bff';
+        button.textContent = scriptEnabled ? 'Enabled' : 'Disabled';
+        // You can put your custom toggle behavior here
+        console.log('Toggled:', scriptEnabled);
+    });
 
   function init() {
     insertStyles();
