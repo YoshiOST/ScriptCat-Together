@@ -1,8 +1,8 @@
 // ==UserScript==
-// @name         Bible.com: Conditional Fixes + Global Margin Removals
+// @name         Bible.com: Conditional Fixes + Global Margin Hides
 // @namespace    https://example.com/
-// @version      2.6
-// @description  Replace <a> with <div>, adjust col-spans, remove max-widths, and strip margins on bible.com
+// @version      2.6-hiding
+// @description  Replace <a> with <div>, adjust col-spans, hide max-widths, and hide margins/elements on bible.com
 // @match        https://www.bible.com/*
 // @grant        none
 // ==/UserScript==
@@ -10,13 +10,11 @@
 (function () {
   'use strict';
 
-function injectOverrides() {
+  function injectOverrides() {
     if (document.getElementById('__sc_overrides')) return; // prevent duplicates
-
     const style = document.createElement('style');
     style.id = '__sc_overrides';
     style.textContent = `
-      /* Override Tailwind defaults */
       @media (min-width: 0px) {
         .sm\\:col-end-12 { grid-column-end: 16 !important; }
         .sm\\:col-start-2 { grid-column-start: 1 !important; }
@@ -26,140 +24,192 @@ function injectOverrides() {
     console.info('[ScriptCat] Injected CSS overrides');
   }
 
-function overrideBodyMinWidth() {
-  const style = document.getElementById('__sc_body_override');
-  if (style) return; // prevent duplicates
+  function overrideBodyMinWidth() {
+    if (document.getElementById('__sc_body_override')) return;
+    const css = `body { min-width: 0 !important; }`;
+    const el = document.createElement('style');
+    el.id = '__sc_body_override';
+    el.textContent = css;
+    document.head.appendChild(el);
+    console.info('[ScriptCat] Body min-width hidden');
+  }
 
-  const css = `
-    body {
-      min-width: 0 !important;
-    }
-  `;
-  const el = document.createElement('style');
-  el.id = '__sc_body_override';
-  el.textContent = css;
-  document.head.appendChild(el);
-  console.info('[ScriptCat] Body min-width removed');
-}
-
-  // --- Detect sticky top bar ---
   function hasStickyBar() {
     return !!document.querySelector(
       '.flex.justify-center.sticky.top-\\[72px\\].md\\:top-\\[80px\\].w-full.z-docked.bg-white.border-b-small.border-gray-15'
     );
   }
 
-  // --- Replace anchors with divs ---
-  function replaceAnchors() {
-    const anchors = document.querySelectorAll('#__next main a');
-    anchors.forEach(anchor => {
-      if (anchor.dataset.__sc_replaced) return;
-
-      const div = document.createElement('div');
-
-      // Copy all attributes except href
-      for (const { name, value } of anchor.attributes) {
-        if (name !== 'href') {
-          div.setAttribute(name, value);
-        }
-      }
-
-      div.innerHTML = anchor.innerHTML;
-      div.dataset.__sc_replaced = '1';
-
-      anchor.replaceWith(div);
-      console.info('[ScriptCat] Replaced <a> with <div>', div);
+  function hidePopVersesAd() {
+    document.querySelectorAll('.flex.flex-col.mbe-2.mbs-8.text-center').forEach(el => {
+      el.style.display = 'none';
     });
   }
 
-  // --- Update lg:col-span-8 → lg:col-span-12 ---
+  function hidePlanAds() {
+    const textElement = document.querySelector(
+      '.text-text-light.dark\\:text-text-dark.text-15.font-aktiv-grotesk.font-bold.mbe-2.text-center'
+    );
+    if (textElement) textElement.style.display = 'none';
+
+    const gridElement = document.querySelector('.grid.gap-2.grid-cols-1.md\\:grid-cols-2');
+    if (gridElement) gridElement.style.display = 'none';
+  }
+
+  function replaceAnchors() {
+  // Select the link you want (by class, href, etc.)
+      const links = document.querySelectorAll('a.no-underline[href^="/bible/compare/"]');
+
+      links.forEach(link => {
+          // Create a new div
+          const div = document.createElement('div');
+          div.className = link.className; // copy classes
+          div.innerHTML = link.innerHTML; // copy inner content
+
+          // Replace the link with the div
+          link.parentNode.replaceChild(div, link);
+      });
+  }
+
   function updateColSpans() {
     const nodes = document.querySelectorAll('#__next .lg\\:col-span-8');
     nodes.forEach(node => {
       node.classList.remove('lg:col-span-8');
       node.classList.add('lg:col-span-12');
-      console.info('[ScriptCat] Updated col-span', node);
     });
   }
 
-  // --- Remove md:max-w-container-sm ---
   function removeMaxWContainer() {
-    const nodes = document.querySelectorAll('#__next .md\\:max-w-container-sm');
-    nodes.forEach(node => {
-      node.classList.remove('md:max-w-container-sm');
-      console.info('[ScriptCat] Removed md:max-w-container-sm', node);
-    });
+    document.querySelectorAll('#__next .md\\:max-w-container-sm')
+      .forEach(node => node.classList.remove('md:max-w-container-sm'));
   }
 
-  // --- Remove max-w-[1200px] ---
   function removeMaxW1200() {
-    const nodes = document.querySelectorAll('#__next .max-w-\\[1200px\\]');
-    nodes.forEach(node => {
-      node.classList.remove('max-w-[1200px]');
-      console.info('[ScriptCat] Removed max-w-[1200px]', node);
-    });
+    document.querySelectorAll('#__next .max-w-\\[1200px\\]')
+      .forEach(node => node.classList.remove('max-w-[1200px]'));
   }
 
-  // --- Remove sticky-specific classes (lg:w-1/2 and max-w-[512px]) ---
+  function hideHeader() {
+    const header = document.querySelector('header.bg-canvas-light.z-banner');
+    if (header) header.style.display = 'none';
+  }
+
+  function hideMiniHeader() {
+    const header = document.querySelector('.leading-comfy');
+    if (header) header.style.display = 'none';
+  }
+
+  function hideElements() {
+    document.querySelectorAll('.z-docked').forEach(el => el.style.display = 'none');
+  }
+
+  function hideCookieBanner() {
+    const cookieBanner = document.querySelector('div.cc-banner');
+    if (cookieBanner) {
+      cookieBanner.remove();
+      console.log("cookie banner removed.");
+    }
+  }
+
+  function hideNextPrevButtons() {
+    const stickyBottom = document.querySelector('.bottom-\\[30\\%\\].pointer-events-none');
+    if (stickyBottom) stickyBottom.style.display = 'none';
+  }
+
+  function hideBottomBar() {
+    const navs = document.querySelectorAll('nav');
+    if (navs.length > 1) navs[1].style.display = 'none';
+  }
+
+  function hideFooterBar() {
+    const navs = document.querySelectorAll('footer');
+    if (navs.length == 1) navs[0].style.display = 'none';
+  }
+
+  function hideSelectedOptions() {
+    const fixedPopup = document.querySelector('.-translate-x-\\[50\\%\\].fixed');
+    if (fixedPopup) fixedPopup.style.display = 'none';
+  }
+
   function removeStickySpecificClasses() {
-    const halfWidthNodes = document.querySelectorAll('#__next .lg\\:w-1\\/2');
-    halfWidthNodes.forEach(node => {
-      node.classList.remove('lg:w-1/2');
-      console.info('[ScriptCat] Removed lg:w-1/2', node);
-    });
-
-    const maxW512Nodes = document.querySelectorAll('#__next .max-w-\\[512px\\]');
-    maxW512Nodes.forEach(node => {
-      node.classList.remove('max-w-[512px]');
-      console.info('[ScriptCat] Removed max-w-[512px]', node);
-    });
+    document.querySelectorAll('#__next .lg\\:w-1\\/2')
+      .forEach(node => node.classList.remove('lg:w-1/2'));
+    document.querySelectorAll('#__next .max-w-\\[512px\\]')
+      .forEach(node => node.classList.remove('max-w-[512px]'));
   }
 
-  // --- Always remove md:mbs-[80px] and sm:mbs-[72px] ---
   function removeGlobalMargins() {
-    const mdNodes = document.querySelectorAll('#__next .md\\:mbs-\\[80px\\]');
-    mdNodes.forEach(node => {
-      node.classList.remove('md:mbs-[80px]');
-      console.info('[ScriptCat] Removed md:mbs-[80px]', node);
-    });
+    document.querySelectorAll('#__next .md\\:mbs-\\[80px\\]')
+      .forEach(node => node.classList.remove('md:mbs-[80px]'));
+    document.querySelectorAll('#__next .md\\:w-5\\/6')
+      .forEach(node => node.classList.remove('md:w-5/6'));
+    document.querySelectorAll('#__next .sm\\:mbs-\\[72px\\]')
+      .forEach(node => node.classList.remove('sm:mbs-[72px]'));
+    document.querySelectorAll('#__next .mbs-4')
+      .forEach(node => node.classList.remove('mbs-4'));
+  }
 
-    const smNodes = document.querySelectorAll('#__next .sm\\:mbs-\\[72px\\]');
-    smNodes.forEach(node => {
-      node.classList.remove('sm:mbs-[72px]');
-      console.info('[ScriptCat] Removed sm:mbs-[72px]', node);
-    });
+  function hideAltTranslations() {
+    document.querySelectorAll('.mbe-2.-mis-2.-mie-2')
+      .forEach(el => el.style.display = 'none');
+  }
 
-    const marginblockstart = document.querySelectorAll('#__next .mbs-4');
-    marginblockstart.forEach(node => {
-      node.classList.remove('mbs-4');
-      console.info('[ScriptCat] Removed mbs-4', node);
-    });
+  function hideAllButtons() {
+    document.querySelectorAll('button.relative.items-center.font-bold')
+      .forEach(el => el.style.display = 'none');
+  }
+
+  function hideAppAd() {
+    document.querySelectorAll('.lg\\:col-start-9.lg\\:col-end-12.mbs-8')
+      .forEach(el => el.style.display = 'none');
+  }
+
+  function hideVerseImages() {
+    const elements = document.querySelectorAll(
+      '.bg-canvas-light.rounded-1'
+    );
+    if (elements.length > 1) {
+      for (let i = 1; i < elements.length; i++) {
+        elements[i].style.display = 'none';
+      }
+    }
+
 
   }
 
   function applyFixes() {
-    injectOverrides(); // always inject overrides
+    hideHeader();
+    injectOverrides();
     overrideBodyMinWidth();
-    // Always remove margins
     removeGlobalMargins();
 
     if (hasStickyBar()) {
-      console.info('[ScriptCat] Sticky top bar detected — skipping normal fixes and removing sticky-specific classes.');
       removeStickySpecificClasses();
+      hideElements();
+      hideFooterBar();
+      hideNextPrevButtons();
+      hideCookieBanner();
       return;
     }
 
-    // Normal fixes
-    replaceAnchors();
     updateColSpans();
+    hideBottomBar();
+    hideSelectedOptions();
+    hidePlanAds();
+    hidePopVersesAd();
+    hideAltTranslations();
+    hideAllButtons();
+    hideAppAd();
+    hideMiniHeader();
     removeMaxWContainer();
     removeMaxW1200();
+    hideVerseImages();
+    hideCookieBanner();
+    replaceAnchors();
+    hideFooterBar();
   }
 
-  // Run after page load
   window.addEventListener('load', applyFixes);
-
-  // Observe DOM changes (React often re-renders)
   const observer = new MutationObserver(applyFixes);
   observer.observe(document.body, { childList: true, subtree: true });
 })();
