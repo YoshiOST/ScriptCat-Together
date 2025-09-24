@@ -40,22 +40,6 @@
     );
   }
 
-  function hidePopVersesAd() {
-    document.querySelectorAll('.flex.flex-col.mbe-2.mbs-8.text-center').forEach(el => {
-      el.style.display = 'none';
-    });
-  }
-
-  function hidePlanAds() {
-    const textElement = document.querySelector(
-      '.text-text-light.dark\\:text-text-dark.text-15.font-aktiv-grotesk.font-bold.mbe-2.text-center'
-    );
-    if (textElement) textElement.style.display = 'none';
-
-    const gridElement = document.querySelector('.grid.gap-2.grid-cols-1.md\\:grid-cols-2');
-    if (gridElement) gridElement.style.display = 'none';
-  }
-
   function replaceAnchors() {
   // Select the link you want (by class, href, etc.)
       const links = document.querySelectorAll('a.no-underline[href^="/bible/compare/"]');
@@ -195,8 +179,6 @@
     updateColSpans();
     hideBottomBar();
     hideSelectedOptions();
-    hidePlanAds();
-    hidePopVersesAd();
     hideAltTranslations();
     hideAllButtons();
     hideAppAd();
