@@ -7,11 +7,83 @@
 // @description  Example userscript for local files
 // @author       You
 // @match        file:///*/eng-web_html/*.htm
+// @match        https://ebible.org/engwebu/*.htm
 // @grant        none
 // ==/UserScript==
 
 (function () {
     'use strict';
+// extra styles
+// Create a style element
+    const styleA = document.createElement('style');
+    styleA.textContent = `
+        div.chapterlabel#V0 {
+            text-align: left !important;
+        }
+    `;
+    document.head.appendChild(styleA);
+
+  const FONT_FAMILIES = "'Arial MT', 'ArialMT', Arial, sans-serif";
+  const CDN_HREF = 'https://fonts.cdnfonts.com/css/arial-mt';
+
+  // 1) add <link> to load the font (if not already present)
+  if (!document.querySelector(`link[href="${CDN_HREF}"]`)) {
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = CDN_HREF;
+    link.crossOrigin = 'anonymous';
+    (document.head || document.documentElement).appendChild(link);
+  }
+
+  // 2) inject a global CSS rule (uses !important)
+  const style = document.createElement('style');
+  style.textContent = `
+    /* fallback import in case link is blocked */
+    @import url('${CDN_HREF}');
+    /* force font for everything */
+    html, body, :root, * , *::before, *::after {
+      font-family: ${FONT_FAMILIES} !important;
+      -webkit-font-smoothing: antialiased !important;
+      -moz-osx-font-smoothing: grayscale !important;
+    }
+  `;
+  (document.head || document.documentElement).appendChild(style);
+
+  // 3) set inline font-family on root + body (helps override some other rules)
+  try {
+    document.documentElement.style.fontFamily = FONT_FAMILIES;
+    if (document.body) document.body.style.fontFamily = FONT_FAMILIES;
+  } catch (e) {}
+
+  // 4) set inline style for every existing element (brute-force but reliable on small local docs)
+  function applyInlineToAll() {
+    const all = document.querySelectorAll('*');
+    for (let i = 0; i < all.length; i++) {
+      try {
+        all[i].style.fontFamily = FONT_FAMILIES;
+      } catch (e) {}
+    }
+  }
+  applyInlineToAll();
+
+  // 5) observe DOM mutations and apply to newly inserted elements
+  const mo = new MutationObserver(muts => {
+    for (const m of muts) {
+      m.addedNodes.forEach(node => {
+        if (node.nodeType === 1) {
+          try { node.style && (node.style.fontFamily = FONT_FAMILIES); } catch (e) {}
+          // also apply to children
+          node.querySelectorAll && node.querySelectorAll('*').forEach(n => {
+            try { n.style && (n.style.fontFamily = FONT_FAMILIES); } catch (e) {}
+          });
+        }
+      });
+    }
+  });
+  mo.observe(document.documentElement || document, { childList: true, subtree: true });
+
+  console.log('ArialMT override applied (CSS + inline). If the font looks unchanged check network / computed styles.');
+
 
 // Create toggle container
     const toggleContainer = document.createElement('div');
@@ -95,7 +167,7 @@
         return;
     }
     if (!nextLink) {
-        console.warn("Target next chapter not found!");
+        console.warn("Target previous chapter not found!");
         return;
     }
 
