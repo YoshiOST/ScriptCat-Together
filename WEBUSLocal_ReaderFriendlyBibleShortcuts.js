@@ -12,16 +12,16 @@
 // ==/UserScript==
 
 (function () {
-    'use strict';
-// extra styles
-// Create a style element
-    const styleA = document.createElement('style');
-    styleA.textContent = `
-        div.chapterlabel#V0 {
+  'use strict';
+  // extra styles
+  // Create a style element
+  const styleA = document.createElement('style');
+  styleA.textContent = `
+        div.chapterlabel#V0, .mt, .mt1 , .mt2 , .mte, .mte1 {
             text-align: left !important;
         }
     `;
-    document.head.appendChild(styleA);
+  document.head.appendChild(styleA);
 
   const FONT_FAMILIES = "Arimo, sans-serif";
   const CDN_HREF = 'https://fonts.googleapis.com/css2?family=Arimo:ital,wght@0,400..700;1,400..700&display=swap';
@@ -53,7 +53,7 @@
   try {
     document.documentElement.style.fontFamily = FONT_FAMILIES;
     if (document.body) document.body.style.fontFamily = FONT_FAMILIES;
-  } catch (e) {}
+  } catch (e) { }
 
   // 4) set inline style for every existing element (brute-force but reliable on small local docs)
   function applyInlineToAll() {
@@ -61,7 +61,7 @@
     for (let i = 0; i < all.length; i++) {
       try {
         all[i].style.fontFamily = FONT_FAMILIES;
-      } catch (e) {}
+      } catch (e) { }
     }
   }
   applyInlineToAll();
@@ -71,10 +71,10 @@
     for (const m of muts) {
       m.addedNodes.forEach(node => {
         if (node.nodeType === 1) {
-          try { node.style && (node.style.fontFamily = FONT_FAMILIES); } catch (e) {}
+          try { node.style && (node.style.fontFamily = FONT_FAMILIES); } catch (e) { }
           // also apply to children
           node.querySelectorAll && node.querySelectorAll('*').forEach(n => {
-            try { n.style && (n.style.fontFamily = FONT_FAMILIES); } catch (e) {}
+            try { n.style && (n.style.fontFamily = FONT_FAMILIES); } catch (e) { }
           });
         }
       });
@@ -85,108 +85,108 @@
   console.log('ArialMT override applied (CSS + inline). If the font looks unchanged check network / computed styles.');
 
 
-// Create toggle container
-    const toggleContainer = document.createElement('div');
-    toggleContainer.style.position = 'fixed';
-    toggleContainer.style.bottom = '10px';
-    toggleContainer.style.left = '100%';
-    toggleContainer.style.transform = 'translateX(-100%)';
-    toggleContainer.style.background = 'rgba(0,0,0,0.7)';
-    toggleContainer.style.padding = '6px 12px';
-    toggleContainer.style.borderRadius = '12px';
-    toggleContainer.style.color = '#fff';
-    toggleContainer.style.fontFamily = 'sans-serif';
-    toggleContainer.style.zIndex = '9999';
-    toggleContainer.style.display = 'flex';
-    toggleContainer.style.alignItems = 'center';
-    toggleContainer.style.gap = '6px';
+  // Create toggle container
+  const toggleContainer = document.createElement('div');
+  toggleContainer.style.position = 'fixed';
+  toggleContainer.style.bottom = '10px';
+  toggleContainer.style.left = '100%';
+  toggleContainer.style.transform = 'translateX(-100%)';
+  toggleContainer.style.background = 'rgba(0,0,0,0.7)';
+  toggleContainer.style.padding = '6px 12px';
+  toggleContainer.style.borderRadius = '12px';
+  toggleContainer.style.color = '#fff';
+  toggleContainer.style.fontFamily = 'sans-serif';
+  toggleContainer.style.zIndex = '9999';
+  toggleContainer.style.display = 'flex';
+  toggleContainer.style.alignItems = 'center';
+  toggleContainer.style.gap = '6px';
 
-    // Label
-    const label = document.createElement('span');
-    label.textContent = 'Footnotes';
-    toggleContainer.appendChild(label);
+  // Label
+  const label = document.createElement('span');
+  label.textContent = 'Footnotes';
+  toggleContainer.appendChild(label);
 
-    // Toggle (checkbox styled like a slider)
-    const toggle = document.createElement('input');
-    toggle.type = 'checkbox';
-    toggle.checked = false; // start visible
-    toggle.style.width = '40px';
-    toggle.style.height = '20px';
-    toggle.style.cursor = 'pointer';
-    toggleContainer.appendChild(toggle);
+  // Toggle (checkbox styled like a slider)
+  const toggle = document.createElement('input');
+  toggle.type = 'checkbox';
+  toggle.checked = false; // start visible
+  toggle.style.width = '40px';
+  toggle.style.height = '20px';
+  toggle.style.cursor = 'pointer';
+  toggleContainer.appendChild(toggle);
 
-    // Append to page
-    document.body.appendChild(toggleContainer);
+  // Append to page
+  document.body.appendChild(toggleContainer);
 
-    // Function to toggle footnotes
-    function toggleFootnotes(show) {
-        document.querySelectorAll('div.footnote').forEach(fn => {
-            fn.style.display = show ? '' : 'none';
-        });
+  // Function to toggle footnotes
+  function toggleFootnotes(show) {
+    document.querySelectorAll('div.footnote').forEach(fn => {
+      fn.style.display = show ? '' : 'none';
+    });
+  }
+
+  // Initial state
+  toggleFootnotes(false);
+
+  // Listen for changes
+  toggle.addEventListener('change', () => {
+    toggleFootnotes(toggle.checked);
+  });
+
+  // Your code here
+  console.log("Userscript running on a local file!");
+
+  // Select all <ul> elements with class 'tnav'
+  const tnavLists = document.querySelectorAll('ul.tnav');
+
+  // Hide each one
+  tnavLists.forEach(ul => {
+    ul.style.display = 'none';
+  });
+
+
+  // Select all spans with class "verse"
+  const verseSpans = document.querySelectorAll("span.verse");
+
+  // Loop through them and hide each one
+  verseSpans.forEach(span => {
+    span.style.display = "none";
+  });
+
+  // Hide all <div> elements with class 'copyright'
+  const copyrightDivs = document.querySelectorAll('div.copyright');
+  copyrightDivs.forEach(div => {
+    div.style.display = 'none';
+  });
+
+  // Find the link once page loads
+  const prevLink = document.querySelector("body > ul > li:nth-child(2) > a");
+  const nextLink = document.querySelector("body > ul > li:nth-child(4) > a");
+  if (!prevLink) {
+    console.warn("Target previous chapter not found!");
+    return;
+  }
+  if (!nextLink) {
+    console.warn("Target previous chapter not found!");
+    return;
+  }
+
+  // Add keyboard shortcut
+  document.addEventListener('keydown', (e) => {
+    if (e.key.toLowerCase() === 'j') {
+      e.preventDefault(); // prevent default browser action
+      prevLink.click(); // simulate click
+      console.log("Shortcut triggered: link clicked!");
     }
+  });
 
-    // Initial state
-    toggleFootnotes(false);
-
-    // Listen for changes
-    toggle.addEventListener('change', () => {
-        toggleFootnotes(toggle.checked);
-    });
-
-    // Your code here
-    console.log("Userscript running on a local file!");
-
-    // Select all <ul> elements with class 'tnav'
-    const tnavLists = document.querySelectorAll('ul.tnav');
-
-    // Hide each one
-    tnavLists.forEach(ul => {
-        ul.style.display = 'none';
-    });
-
-
-    // Select all spans with class "verse"
-    const verseSpans = document.querySelectorAll("span.verse");
-
-    // Loop through them and hide each one
-    verseSpans.forEach(span => {
-        span.style.display = "none";
-    });
-
-    // Hide all <div> elements with class 'copyright'
-    const copyrightDivs = document.querySelectorAll('div.copyright');
-    copyrightDivs.forEach(div => {
-        div.style.display = 'none';
-    });
-
-    // Find the link once page loads
-    const prevLink = document.querySelector("body > ul > li:nth-child(2) > a");
-    const nextLink = document.querySelector("body > ul > li:nth-child(4) > a");
-    if (!prevLink) {
-        console.warn("Target previous chapter not found!");
-        return;
+  // Add keyboard shortcut
+  document.addEventListener('keydown', (e) => {
+    if (e.key.toLowerCase() === 'l') {
+      e.preventDefault(); // prevent default browser action
+      nextLink.click(); // simulate click
+      console.log("Shortcut triggered: link clicked!");
     }
-    if (!nextLink) {
-        console.warn("Target previous chapter not found!");
-        return;
-    }
-
-    // Add keyboard shortcut
-    document.addEventListener('keydown', (e) => {
-        if (e.key.toLowerCase() === 'j') {
-            e.preventDefault(); // prevent default browser action
-            prevLink.click(); // simulate click
-            console.log("Shortcut triggered: link clicked!");
-        }
-    });
-
-        // Add keyboard shortcut
-    document.addEventListener('keydown', (e) => {
-        if (e.key.toLowerCase() === 'l') {
-            e.preventDefault(); // prevent default browser action
-            nextLink.click(); // simulate click
-            console.log("Shortcut triggered: link clicked!");
-        }
-    });
+  });
 
 })();
