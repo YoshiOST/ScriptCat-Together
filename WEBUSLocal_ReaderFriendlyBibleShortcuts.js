@@ -95,7 +95,7 @@
         return;
     }
     if (!nextLink) {
-        console.warn("Target previous chapter not found!");
+        console.warn("Target next chapter not found!");
         return;
     }
 
