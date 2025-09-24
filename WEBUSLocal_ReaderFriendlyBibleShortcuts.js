@@ -2,7 +2,7 @@
 // eslint-disable-next-line userscripts/no-invalid-metadata
 // ==UserScript==
 // @name         WEBUS Bible Reader + ShortCuts
-// @namespace    http://tampermonkey.net/
+// @namespace    webusbible
 // @version      1.0
 // @description  Example userscript for local files
 // @author       You
@@ -23,8 +23,8 @@
     `;
     document.head.appendChild(styleA);
 
-  const FONT_FAMILIES = "'Arial MT', 'ArialMT', Arial, sans-serif";
-  const CDN_HREF = 'https://fonts.cdnfonts.com/css/arial-mt';
+  const FONT_FAMILIES = "Arimo, sans-serif";
+  const CDN_HREF = 'https://fonts.googleapis.com/css2?family=Arimo:ital,wght@0,400..700;1,400..700&display=swap';
 
   // 1) add <link> to load the font (if not already present)
   if (!document.querySelector(`link[href="${CDN_HREF}"]`)) {
