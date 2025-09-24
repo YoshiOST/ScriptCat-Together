@@ -82,7 +82,7 @@
   });
   mo.observe(document.documentElement || document, { childList: true, subtree: true });
 
-  console.log('ArialMT override applied (CSS + inline). If the font looks unchanged check network / computed styles.');
+  console.log('Arial override applied (CSS + inline). If the font looks unchanged check network / computed styles.');
 
 
   // Create toggle container
