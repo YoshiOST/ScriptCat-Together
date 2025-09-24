@@ -191,6 +191,43 @@
     hideFooterBar();
   }
 
+  // Find the link once page loads
+  const cursor = document.querySelectorAll(".\\[pointer-events\\:all\\]");
+  const prevLink = cursor[0].childNodes[0]
+  const nextLink = cursor[1].childNodes[0]
+  // const cursorP = document.getElementsByClassName('next-arrow');
+  // const cursorL = document.getElementsByClassName('prev-arrow');
+  // const prevLink = cursorP[0].childNodes[0]
+  // const nextLink = cursorL[1].childNodes[0]
+  console.log(prevLink)
+  console.log(nextLink)
+  if (!prevLink) {
+      console.warn("Target previous chapter not found!");
+      return;
+  }
+  if (!nextLink) {
+      console.warn("Target previous chapter not found!");
+      return;
+  }
+
+  // Add keyboard shortcut
+  document.addEventListener('keydown', (e) => {
+      if (e.key.toLowerCase() === 'j') {
+          e.preventDefault(); // prevent default browser action
+          prevLink.click(); // simulate click
+          console.log("Shortcut triggered: link clicked!");
+      }
+  });
+
+      // Add keyboard shortcut
+  document.addEventListener('keydown', (e) => {
+      if (e.key.toLowerCase() === 'l') {
+          e.preventDefault(); // prevent default browser action
+          nextLink.click(); // simulate click
+          console.log("Shortcut triggered: link clicked!");
+      }
+  });
+
   window.addEventListener('load', applyFixes);
   const observer = new MutationObserver(applyFixes);
   observer.observe(document.body, { childList: true, subtree: true });
