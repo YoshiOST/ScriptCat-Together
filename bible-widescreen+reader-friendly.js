@@ -41,18 +41,18 @@
   }
 
   function replaceAnchors() {
-  // Select the link you want (by class, href, etc.)
-      const links = document.querySelectorAll('a.no-underline[href^="/bible/compare/"]');
+    // Select the link you want (by class, href, etc.)
+    const links = document.querySelectorAll('a.no-underline[href^="/bible/compare/"]');
 
-      links.forEach(link => {
-          // Create a new div
-          const div = document.createElement('div');
-          div.className = link.className; // copy classes
-          div.innerHTML = link.innerHTML; // copy inner content
+    links.forEach(link => {
+      // Create a new div
+      const div = document.createElement('div');
+      div.className = link.className; // copy classes
+      div.innerHTML = link.innerHTML; // copy inner content
 
-          // Replace the link with the div
-          link.parentNode.replaceChild(div, link);
-      });
+      // Replace the link with the div
+      link.parentNode.replaceChild(div, link);
+    });
   }
 
   function updateColSpans() {
@@ -90,7 +90,8 @@
   function hideCookieBanner() {
     const cookieBanner = document.querySelector('div.cc-banner');
     if (cookieBanner) {
-      cookieBanner.remove();
+      // cookieBanner.remove();
+      cookieBanner.style.display = 'none'
       console.log("cookie banner removed.");
     }
   }
@@ -170,6 +171,7 @@
     if (hasStickyBar()) {
       removeStickySpecificClasses();
       hideElements();
+      hideBottomBar();
       hideFooterBar();
       hideNextPrevButtons();
       hideCookieBanner();
@@ -193,40 +195,56 @@
 
   // Find the link once page loads
   const cursor = document.querySelectorAll(".\\[pointer-events\\:all\\]");
-  const prevLink = cursor[0].childNodes[0]
-  const nextLink = cursor[1].childNodes[0]
+
+  let prevLink = null;
+  let nextLink = null;
+
+  if (cursor.length > 0 && cursor[0]) {
+    prevLink = cursor[0];
+    if (cursor[0].childNodes.length > 0) {
+      prevLink = cursor[0].childNodes[0].href;
+    }
+  }
+
+  if (cursor.length > 1 && cursor[1]) {
+    nextLink = cursor[1];
+    if (cursor[1].childNodes.length > 0) {
+      nextLink = cursor[1].childNodes[0].href;
+    }
+  }
+
   // const cursorP = document.getElementsByClassName('next-arrow');
   // const cursorL = document.getElementsByClassName('prev-arrow');
   // const prevLink = cursorP[0].childNodes[0]
   // const nextLink = cursorL[1].childNodes[0]
-  console.log(prevLink)
-  console.log(nextLink)
+  console.log(prevLink);
+  console.log(nextLink);
   if (!prevLink) {
-      console.warn("Target previous chapter not found!");
-      return;
+    console.warn("Target previous chapter not found!");
+  } else {
+    // Add keyboard shortcut
+    document.addEventListener('keydown', (e) => {
+      if (e.key.toLowerCase() === 'j') {
+        e.preventDefault(); // prevent default browser action
+        // prevLink.click(); // simulate click
+        window.location.href = prevLink;
+        console.log("Shortcut triggered: link clicked!");
+      }
+    });
   }
   if (!nextLink) {
-      console.warn("Target previous chapter not found!");
-      return;
-  }
-
-  // Add keyboard shortcut
-  document.addEventListener('keydown', (e) => {
-      if (e.key.toLowerCase() === 'j') {
-          e.preventDefault(); // prevent default browser action
-          prevLink.click(); // simulate click
-          console.log("Shortcut triggered: link clicked!");
-      }
-  });
-
-      // Add keyboard shortcut
-  document.addEventListener('keydown', (e) => {
+    console.warn("Target previous chapter not found!");
+  } else {
+    // Add keyboard shortcut
+    document.addEventListener('keydown', (e) => {
       if (e.key.toLowerCase() === 'l') {
-          e.preventDefault(); // prevent default browser action
-          nextLink.click(); // simulate click
-          console.log("Shortcut triggered: link clicked!");
+        e.preventDefault(); // prevent default browser action
+        // nextLink.click(); // simulate click
+        window.location.href = nextLink;
+        console.log("Shortcut triggered: link clicked!");
       }
-  });
+    });
+  }
 
   window.addEventListener('load', applyFixes);
   const observer = new MutationObserver(applyFixes);
