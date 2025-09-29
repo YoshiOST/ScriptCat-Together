@@ -15,7 +15,22 @@
 // ==/UserScript==
 
 (function () {
+  'use strict';
 
+  // Create style for bible shortcuts group
+  const style_bs = document.createElement('style');
+  style_bs.textContent = `
+    .show-on-right {
+      display: none;
+      background: rgba(0,0,0,0.7);
+    }
+  `;
+  document.head.appendChild(style_bs);
+
+
+  // bible shortcuts parent div
+  const bibleshortcuts = document.createElement('bibleshortcuts');
+  bibleshortcuts.classList.add('show-on-right')
   // Find the link once page loads
   const prevLink = document.querySelector("body > ul > li:nth-child(2) > a");
   const nextLink = document.querySelector("body > ul > li:nth-child(4) > a");
@@ -36,10 +51,6 @@
     tnavLists[1].insertAdjacentElement('afterend', nav);
     tnavLists = document.querySelectorAll('ul.tnav');
 
-  // Finally, append the nav to the document (for example, body)
-  // document.body.appendChild(nav);
-
-  'use strict';
   // extra styles
   // Create a style element
   const styleA = document.createElement('style');
@@ -196,27 +207,28 @@
   const label_index = document.createElement('a');
   container_index.textContent = 'Index';
   label_index.href = 'indexbar.htm';
-  document.body.appendChild(label_index);
+  bibleshortcuts.appendChild(label_index);
   label_index.appendChild(container_index);
 
   //moved prev and next label
   const label_prev = document.createElement('a');
   container_prev.textContent = '<';
   label_prev.href = prevLink;
-  document.body.appendChild(label_prev);
+  bibleshortcuts.appendChild(label_prev);
   label_prev.appendChild(container_prev);
   //moved prev and next label
   const label_next = document.createElement('a');
   container_next.textContent = '>';
   label_next.href = nextLink;
-  document.body.appendChild(label_next);
+  bibleshortcuts.appendChild(label_next);
   label_next.appendChild(container_next);
 
   // Append to page
-  document.body.appendChild(container_footnote);
-  document.body.appendChild(container_jump);
+  bibleshortcuts.appendChild(container_footnote);
+  bibleshortcuts.appendChild(container_jump);
   //document.body.appendChild(container_index);
 
+  document.body.appendChild(bibleshortcuts)
   // Function to toggle footnotes
   function toggleFootnotes(show) {
     document.querySelectorAll('div.footnote').forEach(fn => {
@@ -292,6 +304,18 @@
       e.preventDefault(); // prevent default browser action
       nextLink.click(); // simulate click
       console.log("Shortcut triggered: link clicked!");
+    }
+  });
+
+  // Track mouse movement
+  document.addEventListener('mousemove', (e) => {
+    const screenWidth = window.innerWidth;
+    const rightThirdStart = screenWidth * (2 / 3);
+
+    if (e.clientX >= rightThirdStart) {
+      bibleshortcuts.style.display = 'block'; // show
+    } else {
+      bibleshortcuts.style.display = 'none'; // hide
     }
   });
 
