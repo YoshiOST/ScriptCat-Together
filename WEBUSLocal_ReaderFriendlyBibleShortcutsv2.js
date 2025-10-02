@@ -17,7 +17,10 @@
   'use strict';
   var nav_visible = false;
   var footnotes_visible = false;
-  // var versenum_visible = false;
+  var apocrypha_visible = false;
+  var not_index = !window.location.href.includes("index.htm");
+  // Get the last section of the URL (after the last "/")
+  const lastPart = window.location.pathname.split("/").pop();
 
   // --- Create container ---
   const bibleshortcuts = document.createElement("bibleshortcuts");
@@ -82,12 +85,19 @@
   document.body.appendChild(bibleshortcuts);
 
   // --- Example usage ---
+  //index bar page hides all bibleshortcut nav
   if (!window.location.href.includes("indexbar.htm")) {
+    //if at main index
+    if (window.location.href.includes("/eng-web/") && !not_index) {
+      addButton("Apocrypha", () => toggleApocrypha());
+    }
+    //if not at indexbar page and at eng-web (the only one with index bar)
     if (window.location.href.includes("/eng-web/")) {
       addButton("Index", () => window.location.href = "indexbar.htm");
     }
-    addButton("Footnotes", () => toggleFootnotes(!footnotes_visible));
-    addButton("UI", () => toggleOldNav(!nav_visible));
+    //always show these buttons
+    addButton("Footnotes", () => toggleFootnotes());
+    addButton("UI", () => toggleOldNav());
     addRow([
       ["<", () => window.location.href = prevLink],
       [">", () => window.location.href = nextLink]
@@ -97,9 +107,9 @@
   // Create style for bible shortcuts group
   const style_bs = document.createElement('style');
   style_bs.textContent = `
-  .show-on-right {
-  display: none;
-  }
+    .show-on-right {
+      display: none;
+    }
   `;
   document.head.appendChild(style_bs);
 
@@ -111,12 +121,12 @@
   // Create a style element
   const styleA = document.createElement('style');
   styleA.textContent = `
-  div.chapterlabel#V0, .mt, .mt1 , .mt2 , .mte, .mte1 {
-  text-align: left !important;
-  }
-  .main {
-  padding-bottom: 250px;
-  }
+    div.chapterlabel#V0, .mt, .mt1 , .mt2 , .mte, .mte1 {
+      text-align: left !important;
+    }
+    .main {
+      padding-bottom: 250px;
+    }
   `;
   document.head.appendChild(styleA);
 
@@ -135,14 +145,14 @@
   // 2) inject a global CSS rule (uses !important)
   const style = document.createElement('style');
   style.textContent = `
-  /* fallback import in case link is blocked */
-  @import url('${CDN_HREF}');
-  /* force font for everything */
-  html, body, :root, * , *::before, *::after {
-  font-family: ${FONT_FAMILIES} !important;
-  -webkit-font-smoothing: antialiased !important;
-  -moz-osx-font-smoothing: grayscale !important;
-  }
+    /* fallback import in case link is blocked */
+    @import url('${CDN_HREF}');
+    /* force font for everything */
+    html, body, :root, * , *::before, *::after {
+      font-family: ${FONT_FAMILIES} !important;
+      -webkit-font-smoothing: antialiased !important;
+      -moz-osx-font-smoothing: grayscale !important;
+    }
   `;
   (document.head || document.documentElement).appendChild(style);
 
@@ -201,6 +211,20 @@
     });
   }
 
+  //hide apocrypha by default
+    console.log("hiding apocrypha");
+    var apoc_titles = document.querySelectorAll('a.aa');
+    apoc_titles.forEach(div => {
+      div.style.display = 'none';
+    });
+
+  function toggleApocrypha() {
+    apocrypha_visible = !apocrypha_visible;
+    apoc_titles.forEach(div => {
+      div.style.display = apocrypha_visible ? '' : 'none';
+    });
+  }
+
   // Select all <ul> elements with class 'tnav'
   var tnavLists = document.querySelectorAll('ul.tnav');
 
@@ -209,25 +233,41 @@
     ul.style.display = 'none';
   });
 
-  // Function to toggle footnotes
-  function toggleOldNav() {
-    nav_visible = !nav_visible;
-    tnavLists.forEach(ul => {
-      ul.style.display = nav_visible ? '' : 'none';
-    });
+  // Hide each one
+  var mainindex = document.querySelectorAll('div.mainindex');
+  mainindex.forEach(ul => {
+    ul.style.display = 'none';
+  });
+
+  if (!/\d/.test(lastPart) && not_index) {
+      toggleOldNav()
+      console.log("show navigation")
   }
 
-  // Your code here
-  console.log("Userscript running on a local file!");
-
-
-  // Select all spans with class "verse"
+    // Select all spans with class "verse"
   const verseSpans = document.querySelectorAll("span.verse");
 
   // Loop through them and hide each one
   verseSpans.forEach(span => {
     span.style.display = "none";
   });
+
+  // Function to toggle footnotes
+  function toggleOldNav() {
+    nav_visible = !nav_visible;
+    tnavLists.forEach(ul => {
+      ul.style.display = nav_visible ? '' : 'none';
+    });
+    mainindex.forEach(ul => {
+      ul.style.display = nav_visible ? '' : 'none';
+    });
+    verseSpans.forEach(span => {
+      span.style.display = nav_visible ? '' : 'none';
+  });
+  }
+
+  // Your code here
+  console.log("Userscript running on a local file!");
 
   // Hide all <div> elements with class 'copyright'
   const copyrightDivs = document.querySelectorAll('div.copyright');
