@@ -10,6 +10,11 @@
 // @match        https://ebible.org/engwebu/*.htm
 // @match        https://ebible.org/eng-web/*.htm
 // @match        https://ebible.org/engwebpb/*.htm
+// @match        https://ebible.org/eng-kjv2006/*
+// @match        https://ebible.org/eng-asv/*
+// @match        https://ebible.org/engoebus/*
+
+
 // @grant        none
 // ==/UserScript==
 
@@ -21,7 +26,7 @@
   const not_index = !window.location.href.includes("index.htm");
   // Get the last section of the URL (after the last "/")
   const lastPart = window.location.pathname.split("/").pop();
-  const is_chapter = !/\d/.test(lastPart);
+  const is_chapter = !/\d+(?=\.htm$)/i.test(lastPart);
   // --- Create container ---
   const bibleshortcuts = document.createElement("bibleshortcuts");
   bibleshortcuts.id = "floatingNavMenu";
