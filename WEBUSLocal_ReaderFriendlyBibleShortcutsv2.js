@@ -18,10 +18,10 @@
   var nav_visible = false;
   var footnotes_visible = false;
   var apocrypha_visible = false;
-  var not_index = !window.location.href.includes("index.htm");
+  const not_index = !window.location.href.includes("index.htm");
   // Get the last section of the URL (after the last "/")
   const lastPart = window.location.pathname.split("/").pop();
-
+  const is_chapter = !/\d/.test(lastPart);
   // --- Create container ---
   const bibleshortcuts = document.createElement("bibleshortcuts");
   bibleshortcuts.id = "floatingNavMenu";
@@ -95,13 +95,19 @@
     if (window.location.href.includes("/eng-web/")) {
       addButton("Index", () => window.location.href = "indexbar.htm");
     }
-    //always show these buttons
-    addButton("Footnotes", () => toggleFootnotes());
+    //don't show buttons on index page
+    if (not_index) {
+      addButton("Footnotes", () => toggleFootnotes());
+    }
     addButton("UI", () => toggleOldNav());
-    addRow([
-      ["<", () => window.location.href = prevLink],
-      [">", () => window.location.href = nextLink]
-    ]);
+    //don't show buttons on index page
+    if (not_index && !is_chapter) {
+      addRow([
+        ["<", () => window.location.href = prevLink],
+        [">", () => window.location.href = nextLink]
+      ]);
+    }
+
   }
 
   // Create style for bible shortcuts group
@@ -212,11 +218,11 @@
   }
 
   //hide apocrypha by default
-    console.log("hiding apocrypha");
-    var apoc_titles = document.querySelectorAll('a.aa');
-    apoc_titles.forEach(div => {
-      div.style.display = 'none';
-    });
+  console.log("hiding apocrypha");
+  var apoc_titles = document.querySelectorAll('a.aa');
+  apoc_titles.forEach(div => {
+    div.style.display = 'none';
+  });
 
   function toggleApocrypha() {
     apocrypha_visible = !apocrypha_visible;
@@ -239,12 +245,12 @@
     ul.style.display = 'none';
   });
 
-  if (!/\d/.test(lastPart) && not_index) {
-      toggleOldNav()
-      console.log("show navigation")
+  if (is_chapter && not_index) {
+    toggleOldNav()
+    console.log("show navigation")
   }
 
-    // Select all spans with class "verse"
+  // Select all spans with class "verse"
   const verseSpans = document.querySelectorAll("span.verse");
 
   // Loop through them and hide each one
@@ -263,7 +269,7 @@
     });
     verseSpans.forEach(span => {
       span.style.display = nav_visible ? '' : 'none';
-  });
+    });
   }
 
   // Your code here
