@@ -162,6 +162,25 @@
 
   }
 
+  function hideAfterPassage(){
+    const parent = document.querySelector("div.mli-auto");
+    if (parent) {
+      // While there are more than 1 child, remove the second one (index 1)
+      const children = parent.children;
+      console.log("children:" + children);
+        for (let i = 1; i < children.length; i++) {
+            children[i].style.display = 'none';
+        }
+    }
+  }
+
+  function hideVerseSelector(){
+    const parent = document.querySelector("#__next > div.flex.flex-col.relative.bg-canvas-light\\'.overflow-x-show > main > div.max-w-full.w-full > div.mli-auto.pli-2.w-full.sm\\:w-full.mbe-12 > div.ChapterContent_yv-bible-text__tqVMm > div.ChapterContent_bible-reader__LmLUa > div.flex-col.md\\:w-\\[480px\\].sm\\:w-\\[100\\%\\].-translate-x-\\[50\\%\\].fixed.sm\\:bottom-6.lg\\:bottom-0.p-3.bg-white.rounded-t-2.shadow-light-2.space-y-1.transition.visible\\:-translate-y-10.translate-y-\\[100\\%\\]");
+    if (parent) {
+        parent.style.display = 'none';
+    }
+  }
+
   function applyFixes() {
     hideHeader();
     injectOverrides();
@@ -175,6 +194,8 @@
       hideFooterBar();
       hideNextPrevButtons();
       hideCookieBanner();
+      hideAfterPassage();
+      hideVerseSelector();
       return;
     }
 

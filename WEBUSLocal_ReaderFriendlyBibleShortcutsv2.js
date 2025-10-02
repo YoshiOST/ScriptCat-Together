@@ -3,13 +3,13 @@
 // ==UserScript==
 // @name         WEBUS Bible Reader + ShortCuts
 // @namespace    webusbible
-// @version      2.0
+// @version      2.1
 // @description  Example userscript for local files
 // @author       YoshiOST & chatgpt snippets
-// @match        file:///*/eng-web_html/*.htm
-// @match        https://ebible.org/engwebu/*.htm
-// @match        https://ebible.org/eng-web/*.htm
-// @match        https://ebible.org/engwebpb/*.htm
+// @match        file:///*/eng-web_html/*
+// @match        https://ebible.org/engwebu/*
+// @match        https://ebible.org/eng-web/*
+// @match        https://ebible.org/engwebpb/*
 // @match        https://ebible.org/eng-kjv2006/*
 // @match        https://ebible.org/eng-asv/*
 // @match        https://ebible.org/engoebus/*
@@ -23,9 +23,10 @@
   var nav_visible = false;
   var footnotes_visible = false;
   var apocrypha_visible = false;
-  const not_index = !window.location.href.includes("index.htm");
+  const has_apocrypha = window.location.href.includes("/eng-web/") || window.location.href.includes("/engwebu/")
   // Get the last section of the URL (after the last "/")
   const lastPart = window.location.pathname.split("/").pop();
+  const is_index = window.location.href.includes("index.htm")||lastPart === "";
   const is_chapter = !/\d+(?=\.htm$)/i.test(lastPart);
   // --- Create container ---
   const bibleshortcuts = document.createElement("bibleshortcuts");
@@ -93,7 +94,7 @@
   //index bar page hides all bibleshortcut nav
   if (!window.location.href.includes("indexbar.htm")) {
     //if at main index
-    if (window.location.href.includes("/eng-web/") && !not_index) {
+    if (has_apocrypha && is_index) {
       addButton("Apocrypha", () => toggleApocrypha());
     }
     //if not at indexbar page and at eng-web (the only one with index bar)
@@ -101,12 +102,12 @@
       addButton("Index", () => window.location.href = "indexbar.htm");
     }
     //don't show buttons on index page
-    if (not_index) {
+    if (!is_index) {
       addButton("Footnotes", () => toggleFootnotes());
     }
     addButton("UI", () => toggleOldNav());
     //don't show buttons on index page
-    if (not_index && !is_chapter) {
+    if (!is_index && !is_chapter) {
       addRow([
         ["<", () => window.location.href = prevLink],
         [">", () => window.location.href = nextLink]
@@ -250,7 +251,7 @@
     ul.style.display = 'none';
   });
 
-  if (is_chapter && not_index) {
+  if (is_chapter && !is_index) {
     toggleOldNav()
     console.log("show navigation")
   }
